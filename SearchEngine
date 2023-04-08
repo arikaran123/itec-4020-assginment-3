@@ -1,0 +1,97 @@
+import os
+import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from collections import defaultdict
+from math import log10
+
+class SearchEngine:
+    def __init__(self, documents_path):
+        self.documents_path = documents_path
+        self.documents = self.load_and_preprocess_documents()
+        self.index = self.create_index()
+
+    def load_and_preprocess_documents(self):
+        documents = {}
+        stop_words = set(stopwords.words('english'))
+        stemmer = PorterStemmer()
+
+        for filename in os.listdir(self.documents_path):
+            if filename.endswith('.txt'):
+                with open(os.path.join(self.documents_path, filename), 'r') as f:
+                    document = f.read()
+                    # Tokenize, remove stop words, and stem the document
+                    tokens = nltk.word_tokenize(document)
+                    tokens = [word.lower() for word in tokens if word.isalpha() and word.lower() not in stop_words]
+                    tokens = [stemmer.stem(word) for word in tokens]
+
+                    documents[filename] = tokens
+
+        return documents
+
+    def create_index(self):
+        index = defaultdict(list)
+
+        for doc_id, doc in self.documents.items():
+            for term in set(doc):
+                index[term].append(doc_id)
+
+        return index
+
+    def search(self, query):
+        # Retrieve the relevant documents for the query
+        query_terms = set(query.split())
+        retrieved_docs = set()
+
+        for term in query_terms:
+            if term in self.index:
+                retrieved_docs.update(set(self.index[term]))
+
+        return list(retrieved_docs)
+
+    def rank_documents(self, query, retrieved_docs):
+        # Rank the retrieved documents based on their relevance to the query
+        scores = {}
+
+        for doc_id in retrieved_docs:
+            score = 0
+            for term in query.split():
+                if term in self.documents[doc_id]:
+                    tf = self.documents[doc_id].count(term)
+                    idf = log10(len(self.documents) / len(self.index[term]))
+                    score += tf * idf
+            scores[doc_id] = score
+
+        ranked_docs = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+
+        return ranked_docs
+
+    def run_search(self):
+        # Execute the search and ranking for the 20 topics/queries
+        queries = self.load_queries()
+        results = []
+        for query in queries:
+            retrieved_docs = self.search(query)
+            ranked_docs = self.rank_documents(query, retrieved_docs)
+            results.append((query, ranked_docs))
+
+        # Write the results to a file
+        self.write_results_to_file(results)
+
+    def load_queries(self):
+        # Load the queries from a file
+        queries_path = 'queries.txt'
+        with open(queries_path, 'r') as f:
+            queries = f.readlines()
+        queries = [query.strip() for query in queries]
+
+        return queries
+
+    def write_results_to_file(self, results):
+        # Write the results to a file
+        output_path = 'results.txt'
+        with open(output_path, 'w') as f:
+            for i, (query, ranked_docs) in enumerate(results):
+                for j, (doc_id, score) in enumerate(ranked_docs):
+                    f.write(f'{i+1} Q0 {doc_id} {j+1} {score} group1\n')
