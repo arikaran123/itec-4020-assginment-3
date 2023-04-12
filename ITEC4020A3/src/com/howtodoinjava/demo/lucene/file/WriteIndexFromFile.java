@@ -24,96 +24,91 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
  
-public class WriteIndexFromFile {
-    public static void main(String[] args) {
-        // Input folder
+public class WriteIndexFromFile
+{
+    public static void main(String[] args)
+    {
+        //Input folder
         String docsPath = "inputFiles";
-
-        // Output folder
+         
+        //Output folder
         String indexPath = "indexedFiles";
-
-        // Input Path Variable
+ 
+        //Input Path Variable
         final Path docDir = Paths.get(docsPath);
-
-        try {
-            // org.apache.lucene.store.Directory instance
-            Directory dir = FSDirectory.open(Paths.get(indexPath));
-
-            // Analyzer with the default stop words
+ 
+        try
+        {
+            //org.apache.lucene.store.Directory instance
+            Directory dir = FSDirectory.open( Paths.get(indexPath) );
+             
+            //analyzer with the default stop words
             Analyzer analyzer = new StandardAnalyzer();
-
-            // IndexWriter Configuration
+             
+            //IndexWriter Configuration
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
             iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
-
-            // IndexWriter writes new index files to the directory
+             
+            //IndexWriter writes new index files to the directory
             IndexWriter writer = new IndexWriter(dir, iwc);
-
-            // Its recursive method to iterate all files and directories
+             
+            //Its recursive method to iterate all files and directories
             indexDocs(writer, docDir);
-
+ 
             writer.close();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
-
-    static void indexDocs(final IndexWriter writer, Path path) throws IOException {
-        // Directory?
-        if (Files.isDirectory(path)) {
-            // Iterate directory
-            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+     
+    static void indexDocs(final IndexWriter writer, Path path) throws IOException
+    {
+        //Directory?
+        if (Files.isDirectory(path))
+        {
+            //Iterate directory
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>()
+            {
                 @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    try {
-                        // Index this file
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
+                {
+                    try
+                    {
+                        //Index this file
                         indexDoc(writer, file, attrs.lastModifiedTime().toMillis());
-                    } catch (IOException ioe) {
+                    }
+                    catch (IOException ioe)
+                    {
                         ioe.printStackTrace();
                     }
                     return FileVisitResult.CONTINUE;
                 }
             });
-        } else {
-            // Index this file
+        }
+        else
+        {
+            //Index this file
             indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
         }
     }
-
-    static void indexDoc(IndexWriter writer, Path file, long lastModified) throws IOException {
-        try (InputStream stream = Files.newInputStream(file)) {
-            // Create Lucene Document
+ 
+    static void indexDoc(IndexWriter writer, Path file, long lastModified) throws IOException
+    {
+        try (InputStream stream = Files.newInputStream(file))
+        {
+            //Create lucene Document
             Document doc = new Document();
-
-            // Parse file contents
-            String contents = new String(Files.readAllBytes(file));
-            String[] lines = contents.split("\n");
-
-            // Extract information from lines and add to fields in document
-            String number = "", title = "", desc = "", narr = "";
-            for (String line : lines) {
-                if (line.startsWith("<num>")) {
-                    number = line.substring(6).trim();
-                } else if (line.startsWith("<title>")) {
-                    title = line.substring(8).trim();
-                } else if (line.startsWith("<desc>")) {
-                    desc = line.substring(7).trim();
-                } else if (line.startsWith("<narr>")) {
-                    narr = line.substring(7).trim();
-                }
-            }
-
+             
             doc.add(new StringField("path", file.toString(), Field.Store.YES));
             doc.add(new LongPoint("modified", lastModified));
-            doc.add(new TextField("number", number, Store.YES));
-            doc.add(new TextField("title", title, Store.YES));
-            doc.add(new TextField("desc", desc, Store.YES));
-            doc.add(new TextField("narr", narr, Store.YES));
-
-            // Updates a document by first deleting the document(s)
-            // containing <code>term</code> and then adding the new
-            // document. The delete and then add are atomic as seen
-            // by a reader on the same index
+            doc.add(new TextField("contents", new String(Files.readAllBytes(file)), Store.YES));
+             
+            //Updates a document by first deleting the document(s)
+            //containing <code>term</code> and then adding the new
+            //document.  The delete and then add are atomic as seen
+            //by a reader on the same index
             writer.updateDocument(new Term("path", file.toString()), doc);
         }
     }

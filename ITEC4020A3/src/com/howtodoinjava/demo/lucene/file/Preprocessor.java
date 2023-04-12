@@ -12,10 +12,10 @@ import org.jsoup.nodes.Document;
 public class Preprocessor {
 
     public static void main(String[] args) throws IOException {
-        String[] inputPaths = {"C:\\Users\\spyma\\Downloads\\LuceneDemo\\data\\WT01",
-                               "C:\\Users\\spyma\\Downloads\\LuceneDemo\\data\\WT02",
-                               "C:\\Users\\spyma\\Downloads\\LuceneDemo\\data\\WT03"};
-        String outputPath = "C:\\Users\\spyma\\Downloads\\LuceneDemo\\inputFiles";
+        String[] inputPaths = {"C:\\Users\\jnune\\Desktop\\dataset\\data\\WT01",
+                               "C:\\Users\\jnune\\Desktop\\dataset\\data\\WT02",
+                               "C:\\Users\\jnune\\Desktop\\dataset\\data\\WT03"};
+        String outputPath = "C:\\Users\\jnune\\Documents\\4020A3\\LuceneDemo\\LuceneDemo\\inputFiles";
         File outputDir = new File(outputPath);
         if (!outputDir.exists()) {
             outputDir.mkdirs();

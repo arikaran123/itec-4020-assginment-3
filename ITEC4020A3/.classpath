@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="C:/Users/jnune/Documents/4020A3/lucene-8.9.0/lucene-8.9.0/analysis/common/lucene-analyzers-common-8.9.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/jnune/Documents/4020A3/lucene-8.9.0/lucene-8.9.0/core/lucene-core-8.9.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/jnune/Documents/4020A3/lucene-8.9.0/lucene-8.9.0/queryparser/lucene-queryparser-8.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/jnune/Desktop/dataset/jsoup-1.15.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
