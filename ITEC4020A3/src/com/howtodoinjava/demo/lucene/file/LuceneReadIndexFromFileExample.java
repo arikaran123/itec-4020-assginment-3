@@ -26,7 +26,7 @@ public class LuceneReadIndexFromFileExample
         IndexSearcher searcher = createSearcher();
          
         //Search indexed contents using search term
-        TopDocs foundDocs = searchInContent("ecuador", searcher);
+        TopDocs foundDocs = searchInContent("IIITD", searcher);
          
         //Total found documents
         System.out.println("Total Results :: " + foundDocs.totalHits);
@@ -46,7 +46,7 @@ public class LuceneReadIndexFromFileExample
         Query query = qp.parse(textToFind);
          
         //search the index
-        TopDocs hits = searcher.search(query, 200);
+        TopDocs hits = searcher.search(query, 20);
         return hits;
     }
  
