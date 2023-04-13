@@ -18,4 +18,4 @@ To search the indexed documents, you need to run the SearchIndex class. To do th
 This will start the search process and allow you to enter search queries to retrieve relevant documents.
 
 Note: If the file paths used in the code do not match the location of your files on your computer, you will need to update them accordingly.
-Open a web browser and navigate to http://localhost:5000 to view the web application.
+
